@@ -1,0 +1,97 @@
+#!/bin/bash
+
+gor ()
+{
+GOR_GIT_CONFIG_URL=$(git remote get-url origin)
+if [ -z "$GOR_GIT_CONFIG_URL" ]; then
+  echo "Not a git repo!"
+  return;
+fi
+GOR_PREFIX='git@github.com:'
+GOR_SUFIX='.git'
+GOR_REMOTE_URL=${GOR_GIT_CONFIG_URL#"$GOR_PREFIX"}
+GOR_REMOTE_URL=${GOR_REMOTE_URL%"$GOR_SUFIX"}
+GOR_REMOTE_URL='https://github.com/'${GOR_REMOTE_URL}
+GOR_MY_GIT_USER=$(git config --get github.user);
+GOR_CURRENT_BRANCH='/tree/'$(git rev-parse --abbrev-ref HEAD)
+GOR_CURRENT_WORKIN_DIR='/tree/master/'$(git rev-parse --show-prefix);
+case "$1" in
+        open | 1)
+            open $GOR_REMOTE_URL
+            ;;
+        opencd | 2)
+            open $GOR_REMOTE_URL$GOR_CURRENT_WORKIN_DIR
+            ;;
+        currentbranch | 3)
+            open $GOR_REMOTE_URL$GOR_CURRENT_BRANCH
+            ;;
+        createpr | 4)
+            open $GOR_REMOTE_URL'/compare/master...'$(git rev-parse --abbrev-ref HEAD)
+            ;;
+        myopenprs | 5)
+            open $GOR_REMOTE_URL'/pulls/'$GOR_MY_GIT_USER
+            ;;
+        myclosedprs | 6)
+            open $GOR_REMOTE_URL'/pulls?q=is%3Apr+is%3Aclosed+author%3A'$GOR_MY_GIT_USER
+            ;;
+        openprs | 7)
+            open $GOR_REMOTE_URL'/pulls'
+            ;;
+        closedprs | 8)
+            open $GOR_REMOTE_URL'/pulls?q=is%3Apr+is%3Aclosed'
+            ;;
+        branch | 9)
+            if [ -z "$2" ]; then
+              echo 'Not branch name provided!'
+              return;
+            fi
+            open $REMOTE_URL'/tree/'$2
+            ;;
+         
+        *)
+            gor_help
+            return
+esac
+}
+
+gor_help ()
+{
+echo "help:gor
+
+#Goto remore repo 
+gor open
+gor 1
+
+#Goto remote repo with the current working folder
+gor opencd
+gor 2
+
+#Goto remote current branch
+gor currentbranch
+gor 3
+
+#Create pr for current branch
+gor createpr
+gor 4
+
+#Goto my open prs
+gor myopenprs
+gor 5
+
+#Goto my closed prs
+gor myclosedprs
+gor 6
+
+#Goto open prs
+gor openprs
+gor 7
+
+#Goto closed prs
+gor closedprs
+gor 8
+
+#Goto remote branch
+gor branch BRANH_NAME
+gor 9 BRANH_NAME
+"
+}
