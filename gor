@@ -11,87 +11,120 @@ GOR_PREFIX='git@github.com:'
 GOR_SUFIX='.git'
 GOR_REMOTE_URL=${GOR_GIT_CONFIG_URL#"$GOR_PREFIX"}
 GOR_REMOTE_URL=${GOR_REMOTE_URL%"$GOR_SUFIX"}
+
+GOR_REPO_PREFIX='git@github.com:okta/'
+GOR_REPO=${GOR_GIT_CONFIG_URL#"$GOR_REPO_PREFIX"}
+GOR_REPO=${GOR_REPO%"$GOR_SUFIX"}
+
 GOR_REMOTE_URL='https://github.com/'${GOR_REMOTE_URL}
 GOR_MY_GIT_USER=$(git config --get github.user);
 GOR_CURRENT_BRANCH='/tree/'$(git rev-parse --abbrev-ref HEAD)
 GOR_CURRENT_WORKIN_DIR='/tree/master/'$(git rev-parse --show-prefix);
+GOR_CURRENT_COMMIT=$(git rev-parse HEAD);
+
+GOR_BACON_URL='https://bacon-go.aue1e.saasure.net/commits'
+gor_artifact $GOR_REPO
+
 case "$1" in
-        open | 1)
+        o | 1) # open
             open $GOR_REMOTE_URL
             ;;
-        opencd | 2)
+        cd | 2) # opencd
             open $GOR_REMOTE_URL$GOR_CURRENT_WORKIN_DIR
             ;;
-        currentbranch | 3)
-            open $GOR_REMOTE_URL$GOR_CURRENT_BRANCH
+        cb | 3) # currentbranch
+            if [ -z "$2" ]; then
+              open $GOR_REMOTE_URL$GOR_CURRENT_BRANCH
+            else
+              open $GOR_BACON_URL'?'$GOR_BACON_ARTIFACT'&branch='$(git rev-parse --abbrev-ref HEAD)
+            fi
             ;;
-        createpr | 4)
+        cpr | 4) # createpr
             open $GOR_REMOTE_URL'/compare/master...'$(git rev-parse --abbrev-ref HEAD)
             ;;
-        myopenprs | 5)
+        cc | 5) # current commit
+            if [ -z "$2" ]; then
+              open $GOR_REMOTE_URL'/commit/'$GOR_CURRENT_COMMIT
+            else
+              open $GOR_BACON_URL'?'$GOR_BACON_ARTIFACT'&sha='$GOR_CURRENT_COMMIT
+            fi
+            ;;
+        moprs | 6) # myopenprs
             open $GOR_REMOTE_URL'/pulls/'$GOR_MY_GIT_USER
             ;;
-        myclosedprs | 6)
+        mcprs | 7) # myclosedprs
             open $GOR_REMOTE_URL'/pulls?q=is%3Apr+is%3Aclosed+author%3A'$GOR_MY_GIT_USER
             ;;
-        openprs | 7)
+        oprs | 8) # openprs
             open $GOR_REMOTE_URL'/pulls'
             ;;
-        closedprs | 8)
+        cprs | 9) # closedprs
             open $GOR_REMOTE_URL'/pulls?q=is%3Apr+is%3Aclosed'
-            ;;
-        branch | 9)
-            if [ -z "$2" ]; then
-              echo 'Not branch name provided!'
-              return;
-            fi
-            open $REMOTE_URL'/tree/'$2
-            ;;
-         
+            ;;         
         *)
             gor_help
             return
 esac
 }
 
+gor_artifact ()
+{
+    case "$1" in
+        okta-core)
+            GOR_BACON_ARTIFACT='artifact=monolith'
+            ;;
+         
+        *)
+            GOR_BACON_ARTIFACT='artifact='$1
+    esac
+}
+
 gor_help ()
 {
 echo "help:gor
 
-#Goto remore repo 
-gor open
+# Goto remore repo 
+gor o # open
 gor 1
 
-#Goto remote repo with the current working folder
-gor opencd
+# Goto remote repo with the current working folder
+gor cd # opencd
 gor 2
 
-#Goto remote current branch
-gor currentbranch
+# Goto remote current branch
+gor cb # currentbranch
 gor 3
 
-#Create pr for current branch
-gor createpr
+# Goto remote current branch in bacon
+gor cb b # currentbranch in bacon
+gor 3 b
+
+# Create pr for current branch
+gor cpr # createpr
 gor 4
 
-#Goto my open prs
-gor myopenprs
+# Goto current commit
+gor cc # current commit
 gor 5
 
-#Goto my closed prs
-gor myclosedprs
+# Goto current commit in bacon
+gor cc b # current commit in bacon
+gor 5
+
+# Goto my open prs
+gor moprs # myopenprs
+gor 5
+
+# Goto my closed prs
+gor mcprs #myclosedprs
 gor 6
 
-#Goto open prs
-gor openprs
+# Goto open prs
+gor oprs # openprs
 gor 7
 
-#Goto closed prs
-gor closedprs
+# Goto closed prs
+gor cprs # closedprs
 gor 8
-
-#Goto remote branch
-gor branch BRANH_NAME
-gor 9 BRANH_NAME
 "
 }

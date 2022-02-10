@@ -15,53 +15,64 @@ source ~/.bash_profile
 
 #### Goto remore repo
 ```
-gor open
+gor o
 gor 1
 ```
 
 #### Goto remote repo with the current working folder
 ```
-gor opencd
+gor cd
 gor 2
 ```
 #### Goto remote current branch
 ```
-gor currentbranch
+gor cb
 gor 3
+```
+
+#### Goto remote current branch in bacon
+```
+gor cb b
+gor 3 b
 ```
 
 #### Create pr for current branch
 ```
-gor createpr
+gor cpr
 gor 4
+```
+#### Goto current commit
+```
+gor cc
+gor 5
+```
+
+#### Goto current commit in bacon
+```
+gor cc b
+gor 5 b
 ```
 
 #### Goto my open prs
 ```
-gor myopenprs
-gor 5
+gor moprs
+gor 6
 ```
 
 #### Goto my closed prs
 ```
-gor myclosedprs
-gor 6
+gor mcprs
+gor 7
 ```
 
 #### Goto open prs
 ```
-gor openprs
-gor 7
+gor oprs
+gor 8
 ```
 
 #### Goto closed prs
 ```
-gor closedprs
-gor 8
-```
-
-#### Goto remote branch
-```
-gor branch BRANH_NAME
-gor 9 BRANH_NAME
+gor cprs
+gor 9
 ```
